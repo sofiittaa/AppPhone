@@ -23,7 +23,6 @@ function MyTabs() {
             />
           );
         },
-        
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />

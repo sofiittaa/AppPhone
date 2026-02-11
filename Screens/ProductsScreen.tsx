@@ -1,6 +1,7 @@
-import { theme } from "@/constants/theme";
-import { Button } from "@react-navigation/elements";
 import React from "react";
+import Counter from "../components/Counter";
+import { theme } from "../constants/theme";
+
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const ProductsScreen = () => {
@@ -9,12 +10,10 @@ const ProductsScreen = () => {
       <View>
         <View style={styles.categorias}>
           <Text style={styles.title}>Productos</Text>
-          <Button onPress={() => {}} style={styles.button}>
-            Categorias
-          </Button>
+          <Counter />
         </View>
 
-        <View style={styles.line}>
+        {/* <View style={styles.line}>
           <View style={styles.productContainer}>
             <Text style={styles.productName}>Manzana</Text>
             <Image
@@ -140,7 +139,7 @@ const ProductsScreen = () => {
               style={styles.productImage}
             />
           </View>
-        </View>
+        </View> */}
       </View>
     </ScrollView>
   );
@@ -154,6 +153,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+
+  button: {
+    borderRadius: 25,
+    width: 110,
+    height: 40,
+    marginTop: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.primary,
+  },
+
   title: {
     color: theme.colors.primary,
     fontSize: 30,
@@ -178,6 +188,7 @@ const styles = StyleSheet.create({
     width: 400,
     display: "flex",
     flexDirection: "row",
+
     flexWrap: "wrap",
   },
 
