@@ -1,14 +1,17 @@
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
 export const ShopServices = createApi({
   reducerPath: "ShopServices",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://fakestoreapi.com/",
+    baseUrl: "https://app-phone-d354f-default-rtdb.firebaseio.com/",
   }),
   endpoints: (builder) => ({
     getProducts: builder.query({
-      query: () => "products",
+      query: () => "products.json",
+      transformResponse: (response) =>
+        response ? Object.values(response) : [],
     }),
   }),
-  middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(ShopServices.middleware), 
-  
 });
+
+export const { useGetProductsQuery } = ShopServices;

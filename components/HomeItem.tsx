@@ -6,10 +6,6 @@ import { theme } from "../constants/theme";
 const HomeItem = () => {
   return (
     <View>
-      <View style={styles.NavBar}>
-        <SearchVar />
-      </View>
-
       <View style={styles.FirstContainer}>
         <View style={styles.container}>
           <Image
@@ -20,6 +16,7 @@ const HomeItem = () => {
         </View>
         <Text style={styles.SobreTitle}> La mejor calidad al mejor precio</Text>
       </View>
+      <SearchVar />
     </View>
   );
 };
@@ -27,23 +24,12 @@ const HomeItem = () => {
 export default HomeItem;
 
 const styles = StyleSheet.create({
-  NavBar: {
-    backgroundColor: theme.colors.primary,
-    width: 390,
-    height: 120,
-    borderRadius: 15,
-    marginTop: 25,
-    marginLeft: 10,
-    flex: -1,
-  },
-
   container: {
     marginBottom: 20,
     width: 412,
     height: 100,
-    marginTop: 15,
+    marginTop: -10,
     borderRadius: 15,
-    display: "flex",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -74,7 +60,7 @@ const styles = StyleSheet.create({
   FirstContainer: {
     marginTop: 30,
     marginLeft: 10,
-    backgroundColor: "#a4a4a45e",
+    backgroundColor: "#b8b8b85e",
     width: 390,
     height: 120,
     borderRadius: 15,

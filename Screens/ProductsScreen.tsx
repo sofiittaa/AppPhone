@@ -1,145 +1,24 @@
 import React from "react";
-import Counter from "../components/Counter";
-import { theme } from "../constants/theme";
-
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import images from "../constants/images";
+import products from "../constants/products";
+import { theme } from "../constants/theme";
 
 const ProductsScreen = () => {
   return (
     <ScrollView>
       <View>
-        <View style={styles.categorias}>
-          <Text style={styles.title}>Productos</Text>
-          <Counter />
+        <View style={styles.line}>
+          {products.map((product, index) => (
+            <View key={index} style={styles.productContainer}>
+              <Text style={styles.productName}>{product.name}</Text>
+              <Image
+                source={images[product.image]}
+                style={styles.productImage}
+              />
+            </View>
+          ))}
         </View>
-
-        {/* <View style={styles.line}>
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Manzana</Text>
-            <Image
-              source={require("../assets/images/manzana.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Banana</Text>
-            <Image
-              source={require("../assets/images/banana.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Naranja</Text>
-            <Image
-              source={require("../assets/images/naranja.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Pera</Text>
-            <Image
-              source={require("../assets/images/pera.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Uva</Text>
-            <Image
-              source={require("../assets/images/uva.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Piña</Text>
-            <Image
-              source={require("../assets/images/piña.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Mango</Text>
-            <Image
-              source={require("../assets/images/mango.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Frutilla</Text>
-            <Image
-              source={require("../assets/images/frutillas.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Kiwi</Text>
-            <Image
-              source={require("../assets/images/kiwi.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Cereza</Text>
-            <Image
-              source={require("../assets/images/cereza.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Melocotón</Text>
-            <Image
-              source={require("../assets/images/melocoton.png")}
-              style={styles.productImage}
-            />
-          </View>
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Sandía</Text>
-            <Image
-              source={require("../assets/images/sandia.png")}
-              style={styles.productImage}
-            />
-          </View>
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Limón</Text>
-            <Image
-              source={require("../assets/images/limon.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Maracuyá</Text>
-            <Image
-              source={require("../assets/images/maracuya.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Coco</Text>
-            <Image
-              source={require("../assets/images/coco.png")}
-              style={styles.productImage}
-            />
-          </View>
-
-          <View style={styles.productContainer}>
-            <Text style={styles.productName}>Granada</Text>
-            <Image
-              source={require("../assets/images/granada.png")}
-              style={styles.productImage}
-            />
-          </View>
-        </View> */}
       </View>
     </ScrollView>
   );
@@ -193,12 +72,10 @@ const styles = StyleSheet.create({
   },
 
   productImage: {
-    flex: 1,
-    width: 140,
-    height: 150,
+    width: 200,
+    height: 100,
   },
   productContainer: {
-    flex: -1,
     borderColor: theme.colors.secondary,
     borderWidth: 1,
     borderRadius: 10,

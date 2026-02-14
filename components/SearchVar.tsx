@@ -1,7 +1,7 @@
+import { theme } from "@/constants/theme";
 import { SearchBar } from "@rneui/themed";
 import { useState } from "react";
 import { View } from "react-native";
-
 
 const SearchVar = () => {
   const [search, setSearch] = useState("");
@@ -13,18 +13,25 @@ const SearchVar = () => {
         value={search}
         onChangeText={setSearch}
         lightTheme
-        round
         containerStyle={{
-          backgroundColor: "rgb(101, 2, 28)",
+          marginTop: 30,
           padding: 0,
         }}
         inputContainerStyle={{
-          backgroundColor: "#fff",
+          backgroundColor: "#ffffff",
+          borderColor: theme.colors.primary,
+          borderLeftWidth: 2,
+          borderRightWidth: 2,
+          borderTopWidth: 2,
+          borderBottomWidth: 2,
           borderRadius: 15,
           height: 45,
+          width: 350,
+          marginLeft: 30,
         }}
         inputStyle={{
-          color: "#000",
+          color: theme.colors.primary,
+          fontFamily: theme.fonts.text,
         }}
       />
     </View>
