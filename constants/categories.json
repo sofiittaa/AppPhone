@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "name": "Frutas"
+  },
+  {
+    "id": "2",
+    "name": "Verduras"
+  },
+  {
+    "id": "3",
+    "name": "Galletitas"
+  },
+  {
+    "id": "4",
+    "name": "Carnes"
+  },
+  {
+    "id": "5",
+    "name": "Bebida"
+  },
+  {
+    "id": "6",
+    "name": "Sin Gluten"
+  },
+  {
+    "id": "7",
+    "name": "Almacen"
+  },
+  {
+    "id": "8",
+    "name": "Snacks"
+  },
+  {
+    "id": "9",
+    "name": "Lacteos"
+  },
+  {
+    "id": "10",
+    "name": "Alcohol"
+  }
+]

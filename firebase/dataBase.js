@@ -1,0 +1,1 @@
+export const base_url = "https://app-phone-d354f-default-rtdb.firebaseio.com/";

@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import CounterSlice from "../components/features/CounterSlice";
+import { CounterReducer } from "../components/features/CounterSlice";
 import { ShopServices } from "../services/ShopServices";
+import { shopReducer } from "../shop/shopSlice";
 
 export const store = configureStore({
   reducer: {
-    counter: CounterSlice,
+    counter: CounterReducer,
+    shop: shopReducer,
     [ShopServices.reducerPath]: ShopServices.reducer,
   },
   middleware: (getDefaultMiddleware) =>

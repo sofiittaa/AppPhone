@@ -1,10 +1,14 @@
 import { theme } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import CartScreen from "../../Screens/CartScreen";
 import HomeScreen from "../../Screens/HomeScreen";
+import PerfilScreen from "../../Screens/PerfilScreen";
 import ProductsScreen from "../../Screens/ProductsScreen";
+import ViewScreen from "../../Screens/ViewScreen";
+import { AppNavigationParamList } from "./types";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<AppNavigationParamList>();
 
 function MyTabs() {
   return (
@@ -13,20 +17,50 @@ function MyTabs() {
         headerShown: false,
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.secondary,
-        tabBarIcon: ({ color, size, focused }) => {
-          const iconName = route.name === "Home" ? "home" : "fast-food-outline";
+        tabBarIcon: ({ focused }) => {
+          const iconName =
+            route.name === "Casa"
+              ? focused
+                ? "home"
+                : "home-outline"
+              : route.name === "Productos"
+                ? focused
+                  ? "fast-food"
+                  : "fast-food-outline"
+                : route.name === "Carrito"
+                  ? focused
+                    ? "cart"
+                    : "cart-outline"
+                  : focused
+                    ? "person"
+                    : "person-outline";
+
           return (
             <Ionicons
               name={iconName}
+              size={30}
               color={focused ? theme.colors.primary : theme.colors.secondary}
-              size={27}
             />
           );
         },
+        tabBarLabelStyle: {
+          fontSize: 15,
+          fontFamily: theme.fonts.text,
+        },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Products" component={ProductsScreen} />
+      <Tab.Screen name="Casa" component={HomeScreen} />
+      <Tab.Screen name="Productos" component={ProductsScreen} />
+      <Tab.Screen name="Carrito" component={CartScreen} />
+      <Tab.Screen name="Perfil" component={PerfilScreen} />
+      <Tab.Screen
+        name="vista"
+        component={ViewScreen}
+        options={{
+          tabBarButton: () => null,
+          tabBarItemStyle: { display: "none" },
+        }}
+      />
     </Tab.Navigator>
   );
 }

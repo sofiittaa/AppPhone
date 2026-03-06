@@ -1,6 +1,8 @@
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import CategoryItem from "./CategoyItem";
 import SearchVar from "../components/SearchVar";
+import categories from "../constants/categories.json";
 import { theme } from "../constants/theme";
 
 const HomeItem = () => {
@@ -17,6 +19,15 @@ const HomeItem = () => {
         <Text style={styles.SobreTitle}> La mejor calidad al mejor precio</Text>
       </View>
       <SearchVar />
+      <View style={styles.categoriesContainer}>
+        <FlatList
+          data={categories}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <CategoryItem item={item} />}
+        />
+      </View>
     </View>
   );
 };
@@ -64,5 +75,9 @@ const styles = StyleSheet.create({
     width: 390,
     height: 120,
     borderRadius: 15,
+  },
+  categoriesContainer: {
+    marginTop: 20,
+    marginHorizontal: 10,
   },
 });
