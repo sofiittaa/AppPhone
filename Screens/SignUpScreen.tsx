@@ -21,29 +21,28 @@ const SignUpScreen = () => {
     } catch (error) {
       console.log(error);
     }
-
-    return (
-      <View style={styles.main}>
-        <Text style={styles.title}>Registrate</Text>
-        <View style={styles.container}>
-          <InputForm label="Email" OnChange={() => {}} error="" />
-          <InputForm label="Contrasena" OnChange={() => {}} error="" isSecure />
-          <InputForm
-            label="Repetir contraseña"
-            OnChange={() => {}}
-            error=""
-            isSecure
-          />
-          <Pressable onPress={onSubmit} style={styles.button}>
-            <Text style={styles.buttonText}>Crear cuenta</Text>
-          </Pressable>
-          <Pressable onPress={handleSignUp} style={styles.linkButton}>
-            <Text style={styles.link}>Ya tienes cuenta? Inicia sesion</Text>
-          </Pressable>
-        </View>
-      </View>
-    );
   };
+  return (
+    <View style={styles.main}>
+      <Text style={styles.title}>Registrate</Text>
+      <View style={styles.container}>
+        <InputForm label="Email" OnChange={setEmail} error="" />
+        <InputForm label="Contrasena" OnChange={setPassword} error="" isSecure />
+        <InputForm
+          label="Repetir contraseña"
+          OnChange={setPassword}
+          error=""
+          isSecure
+        />
+        <Pressable onPress={onSubmit} style={styles.button}>
+          <Text style={styles.buttonText}>Crear cuenta</Text>
+        </Pressable>
+        <Pressable onPress={handleSignUp} style={styles.linkButton}>
+          <Text style={styles.link}>Ya tienes cuenta? Inicia sesion</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
 };
 
 export default SignUpScreen;

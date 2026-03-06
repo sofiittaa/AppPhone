@@ -1,10 +1,9 @@
+import { auth } from "../firebase/fireBaseConfig";
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-    signOut,
-} from "firebase/auth";
-import { auth } from "../firebase/fireBaseConfig";
-
+} from "./loginUser";
+import { signOut } from "./logOut";
 
 export const registerUser = async (email, password) => {
   try {
@@ -13,9 +12,9 @@ export const registerUser = async (email, password) => {
       email,
       password,
     );
-    console.log("Usuario registrado:", userCredential.user);
+    return userCredential.user;
   } catch (error) {
-    console.error("Error en el registro:", error.message);
+    throw new Error(error.message || "Error en el registro");
   }
 };
 
@@ -26,17 +25,17 @@ export const loginUser = async (email, password) => {
       email,
       password,
     );
-    console.log("Usuario logueado:", userCredential.user);
+    return userCredential.user;
   } catch (error) {
-    console.error("Error en el login:", error.message);
+    throw new Error(error.message || "Error en el login");
   }
 };
 
 export const logoutUser = async () => {
   try {
     await signOut(auth);
-    console.log("Sesión cerrada");
+    return true;
   } catch (error) {
-    console.error("Error al cerrar sesión:", error.message);
+    throw new Error(error.message || "Error al cerrar sesion");
   }
 };

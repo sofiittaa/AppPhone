@@ -1,7 +1,7 @@
-import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 
-const fireBaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCPLrLWOs0n6-PSQq7A_td01r4jg5xcp7k",
   authDomain: "app-phone-d354f.firebaseapp.com",
   databaseURL: "https://app-phone-d354f-default-rtdb.firebaseio.com",
@@ -12,9 +12,8 @@ const fireBaseConfig = {
   measurementId: "G-RW5WP0CPVN",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 
-const analytics = getAnalytics(app);
+export default app;
