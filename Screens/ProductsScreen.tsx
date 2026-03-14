@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
-import images from "../constants/images";
+
 import { theme } from "../constants/theme";
 import { useGetProductsQuery } from "../services/ShopServices";
 
@@ -16,7 +16,9 @@ const ProductsScreen = () => {
   const navigation: any = useNavigation();
 
   const { data: products = [], isLoading, error } = useGetProductsQuery();
-  const validProducts = products.filter((product) => product && product.name && product.image);
+  const validProducts = products.filter(
+    (product) => product && product.name && product.image,
+  );
 
   return (
     <ScrollView>
@@ -26,7 +28,7 @@ const ProductsScreen = () => {
             <View key={product.id} style={styles.productContainer}>
               <Text style={styles.productName}>{product.name}</Text>
               <Image
-                source={images[product.image]}
+                source={{ uri: product.image }}
                 style={styles.productImage}
               />
               <Pressable

@@ -1,13 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import allCategories from "../constants/categories.json";
-import allProducts from "../constants/products.json";
 
 const initialState = {
-  categories: allCategories,
-  products: Object.entries(allProducts).map(([id, product]) => ({
-    id,
-    ...product,
-  })),
+  categories: [],
+  products: [],
   selectedCategory: null,
   selectedProduct: null,
   productsFilteredByCategory: [],
@@ -20,7 +15,7 @@ const shopSlice = createSlice({
     setSelectedCategory: (state, action) => {
       state.selectedCategory = action.payload;
       state.productsFilteredByCategory = state.products.filter(
-        (p) => p.categories === action.payload?.name
+        (p) => p.categories === action.payload?.name,
       );
     },
     setSelectedProduct: (state, action) => {
@@ -29,10 +24,13 @@ const shopSlice = createSlice({
     setProducts: (state, action) => {
       state.products = action.payload;
     },
+    setCategories: (state, action) => {
+      state.categories = action.payload;
+    },
   },
 });
 
-export const { setSelectedCategory, setSelectedProduct, setProducts } =
+export const { setSelectedCategory, setSelectedProduct, setProducts, setCategories } =
   shopSlice.actions;
 
 export const shopReducer = shopSlice.reducer;

@@ -1,26 +1,86 @@
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useDispatch } from "react-redux";
+import { setProfilePicture, setUser } from "../auth/authSlice";
 import InputForm from "../components/InputForm";
 import theme from "../constants/theme";
+import { loginUser } from "../services/authService";
 
 const Login = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const onSubmit = () => {
-    router.push("/");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const onSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      setError("");
+
+      const user = await loginUser(email.trim(), password);
+
+      let profileName = "";
+      let profileImage = "";
+      try {
+        const idToken = await user.getIdToken();
+        const response = await fetch(
+          `https://app-phone-d354f-default-rtdb.firebaseio.com/profiles/${user.uid}.json?auth=${idToken}`,
+        );
+        const profile = await response.json();
+        profileName = profile?.name || "";
+        profileImage = profile?.image || "";
+      } catch {
+        profileName = "";
+        profileImage = "";
+      }
+
+      dispatch(
+        setUser({
+          name: profileName || user.displayName || "",
+          email: user.email ?? email.trim(),
+          password,
+          localId: user.uid,
+        }),
+      );
+      dispatch(setProfilePicture(profileImage));
+
+      router.replace("/");
+    } catch (err: any) {
+      setError(err?.message || "No se pudo iniciar sesion");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <View style={styles.main}>
       <Text style={styles.title}>Inicia sesion</Text>
       <View style={styles.container}>
-        <InputForm label="Email" OnChange={() => {}} error="" />
-        <InputForm label="Contrasena" OnChange={() => {}} error="" isSecure />
-        <Pressable onPress={onSubmit} style={styles.button}>
-          <Text style={styles.buttonText}>Entrar</Text>
+        <InputForm label="Email" OnChange={setEmail} error="" />
+        <InputForm
+          label="Contrasena"
+          OnChange={setPassword}
+          error=""
+          isSecure
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <Pressable
+          onPress={onSubmit}
+          style={styles.button}
+          disabled={isSubmitting}
+        >
+          <Text style={styles.buttonText}>
+            {isSubmitting ? "Entrando..." : "Entrar"}
+          </Text>
         </Pressable>
-        <Pressable onPress={() => router.push("/signup")} style={styles.linkButton}>
+        <Pressable
+          onPress={() => router.push("/signup")}
+          style={styles.linkButton}
+        >
           <Text style={styles.link}>No tienes cuenta? Registrate</Text>
         </Pressable>
       </View>
@@ -46,7 +106,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontFamily: theme.fonts.title,
-    color: theme.colors.text,
+    color: theme.colors.primary,
     marginBottom: 20,
   },
   button: {
@@ -69,5 +129,11 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: 14,
     fontFamily: theme.fonts.text,
+  },
+  error: {
+    color: "red",
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: 6,
   },
 });

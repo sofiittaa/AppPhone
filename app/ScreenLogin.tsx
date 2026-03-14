@@ -1,5 +1,5 @@
-import Login from "@/components/Login";
+import ScreenLoginRoute from "@/Screens/ScreenLogin";
 
-export default function ScreenLoginRoute() {
-  return <Login />;
+export default function ScreenLoginPage() {
+  return <ScreenLoginRoute />;
 }

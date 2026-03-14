@@ -1,43 +1,146 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useDispatch } from "react-redux";
+import { setUser } from "../auth/authSlice";
 import InputForm from "../components/InputForm";
 import theme from "../constants/theme";
 import { registerUser } from "../services/authService";
+import { useUpsertUserProfileMutation } from "../services/userServices";
+import signUpSchema from "../validations/signUpSchemma";
+
+type FormData = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 const SignUpScreen = () => {
   const router = useRouter();
-  const onSubmit = () => {
-    router.push("/");
-  };
+  const dispatch = useDispatch();
+  const [upsertUserProfile] = useUpsertUserProfileMutation();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const handleSignUp = async () => {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
     try {
-      await registerUser(email, password);
-      router.push("/");
-    } catch (error) {
-      console.log(error);
+      setIsSubmitting(true);
+      setErrors({});
+
+      const cleanData = {
+        ...formData,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+      };
+
+      await signUpSchema.validate(cleanData, { abortEarly: false });
+
+      const user = await registerUser(cleanData.email, cleanData.password, cleanData.name);
+
+      dispatch(
+        setUser({
+          name: cleanData.name,
+          email: user.email ?? cleanData.email,
+          password: cleanData.password,
+          localId: user.uid,
+        }),
+      );
+
+      await upsertUserProfile({
+        localId: user.uid,
+        profile: {
+          name: cleanData.name,
+          email: user.email ?? cleanData.email,
+        },
+      }).unwrap();
+
+      router.replace("/");
+    } catch (err: any) {
+      if (err?.inner) {
+        const validationErrors: Record<string, string> = {};
+
+        err.inner.forEach((error: any) => {
+          validationErrors[error.path] = error.message;
+        });
+
+        setErrors(validationErrors);
+      } else {
+        setErrors({
+          general:
+            err?.message ||
+            "No se pudo crear la cuenta. Verifica Email/Password en Firebase Auth.",
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   return (
     <View style={styles.main}>
       <Text style={styles.title}>Registrate</Text>
+
       <View style={styles.container}>
-        <InputForm label="Email" OnChange={setEmail} error="" />
-        <InputForm label="Contrasena" OnChange={setPassword} error="" isSecure />
         <InputForm
-          label="Repetir contraseña"
-          OnChange={setPassword}
-          error=""
+          label="Nombre"
+          OnChange={(value) => handleChange("name", value)}
+          error={errors.name}
+        />
+
+        <InputForm
+          label="Email"
+          OnChange={(value) => handleChange("email", value)}
+          error={errors.email}
+        />
+
+        <InputForm
+          label="Contrasena"
+          OnChange={(value) => handleChange("password", value)}
+          error={errors.password}
           isSecure
         />
-        <Pressable onPress={onSubmit} style={styles.button}>
-          <Text style={styles.buttonText}>Crear cuenta</Text>
+
+        <InputForm
+          label="Repetir contrasena"
+          OnChange={(value) => handleChange("confirmPassword", value)}
+          error={errors.confirmPassword}
+          isSecure
+        />
+
+        {errors.general ? (
+          <Text style={styles.generalError}>{errors.general}</Text>
+        ) : null}
+
+        <Pressable
+          onPress={handleSubmit}
+          style={styles.button}
+          disabled={isSubmitting}
+        >
+          <Text style={styles.buttonText}>
+            {isSubmitting ? "Creando..." : "Crear cuenta"}
+          </Text>
         </Pressable>
-        <Pressable onPress={handleSignUp} style={styles.linkButton}>
+
+        <Pressable
+          onPress={() => router.push("/ScreenLogin")}
+          style={styles.linkButton}
+        >
           <Text style={styles.link}>Ya tienes cuenta? Inicia sesion</Text>
         </Pressable>
       </View>
@@ -63,7 +166,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontFamily: theme.fonts.title,
-    color: theme.colors.text,
+    color: theme.colors.primary,
     marginBottom: 20,
   },
   button: {
@@ -87,4 +190,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: theme.fonts.text,
   },
+  generalError: {
+    color: "red",
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: 6,
+  },
 });
+
+

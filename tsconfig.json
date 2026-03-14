@@ -11,5 +11,5 @@
   "include": [
     "**/*.ts",
     "**/*.tsx"
-, "shop/shopSlice.js"  ]
+, "shop/shopSlice.js", "src/navigation/profileStack.jsx"  ]
 }

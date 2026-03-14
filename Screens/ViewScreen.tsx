@@ -1,15 +1,30 @@
+import { addToCart } from "@/shop/cartSlice";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import images from "../constants/images";
+import { useDispatch } from "react-redux";
 import { theme } from "../constants/theme";
 import { AppNavigationParamList } from "../src/navigation/types";
 
 type ViewContainerRouteProp = RouteProp<AppNavigationParamList, "vista">;
 
 const ViewScreen = () => {
+  const dispatch = useDispatch();
   const route = useRoute<ViewContainerRouteProp>();
   const product = route.params?.product;
+  const imageUrl = product?.image || "";
+
+  const handleAddToCart = () => {
+    if (!product) return;
+    dispatch(
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+      }),
+    );
+  };
 
   if (!product) {
     return (
@@ -22,14 +37,20 @@ const ViewScreen = () => {
   return (
     <View style={styles.container}>
       <View key={product.id} style={styles.card}>
-        <Image source={images[product.image]} style={styles.image} />
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={styles.image} />
+        ) : (
+          <View style={[styles.image, styles.imagePlaceholder]}>
+            <Text style={{ color: theme.colors.text }}>Sin imagen</Text>
+          </View>
+        )}
       </View>
       <Text style={styles.title}>{product.name}</Text>
       <Text style={styles.price}>${product.price}</Text>
       <Text style={styles.category}>{product.categories}</Text>
-      <Pressable style={styles.button}>
+      <Pressable style={styles.button} onPress={handleAddToCart}>
         <Text style={{ color: theme.colors.background, fontSize: 15 }}>
-          Comprar
+          Añadir al carrito
         </Text>
       </Pressable>
     </View>
@@ -70,6 +91,11 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginRight: 270,
     marginBottom: 20,
+  },
+  imagePlaceholder: {
+    backgroundColor: "#ddd",
+    alignItems: "center",
+    justifyContent: "center",
   },
   card: {
     marginTop: -200,

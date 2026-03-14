@@ -28,24 +28,34 @@ export const ShopServices = createApi({
               .filter(([, product]) => product != null)
               .map(([id, product]) => ({
                 id,
-                ...(product as any),
+                name: (product as any).nombre || (product as any).name,
+                image: (product as any).imagen || (product as any).image,
+                categories:
+                  (product as any).categoria || (product as any).categories,
+                price: (product as any).precio || (product as any).price,
+                ...((product as any).descripcion
+                  ? { description: (product as any).descripcion }
+                  : {}),
               }))
           : [],
     }),
-    
     getCategories: builder.query({
       query: () => "categories.json",
     }),
     getProductsByCategory: builder.query<Product[], string>({
       query: (category) =>
-        `products.json?orderBy="categories"&equalTo="${category}"`,
+        `products.json?orderBy="categoria"&equalTo="${category}"`,
       transformResponse: (response: any) =>
         response
           ? Object.entries(response)
               .filter(([, product]) => product != null)
               .map(([id, product]) => ({
                 id,
-                ...(product as any),
+                name: (product as any).nombre || (product as any).name,
+                image: (product as any).imagen || (product as any).image,
+                categories:
+                  (product as any).categoria || (product as any).categories,
+                price: (product as any).precio || (product as any).price,
               }))
           : [],
     }),

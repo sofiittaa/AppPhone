@@ -1,41 +1,31 @@
-import { auth } from "../firebase/fireBaseConfig";
 import {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-} from "./loginUser";
-import { signOut } from "./logOut";
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../firebase/fireBaseConfig";
 
-export const registerUser = async (email, password) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-    return userCredential.user;
-  } catch (error) {
-    throw new Error(error.message || "Error en el registro");
+export const registerUser = async (email, password, name = "") => {
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password,
+  );
+
+  if (name.trim()) {
+    await updateProfile(userCredential.user, { displayName: name.trim() });
   }
+
+  return userCredential.user;
 };
 
 export const loginUser = async (email, password) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-    return userCredential.user;
-  } catch (error) {
-    throw new Error(error.message || "Error en el login");
-  }
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  return userCredential.user;
 };
 
 export const logoutUser = async () => {
-  try {
-    await signOut(auth);
-    return true;
-  } catch (error) {
-    throw new Error(error.message || "Error al cerrar sesion");
-  }
+  await signOut(auth);
+  return true;
 };

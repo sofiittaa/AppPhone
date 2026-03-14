@@ -2,10 +2,18 @@ import React from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import CategoryItem from "./CategoyItem";
 import SearchVar from "../components/SearchVar";
-import categories from "../constants/categories.json";
 import { theme } from "../constants/theme";
+import { useGetCategoriesQuery } from "../services/ShopServices";
 
 const HomeItem = () => {
+  const { data: categoriesData } = useGetCategoriesQuery(undefined);
+  const categories = categoriesData
+    ? Object.entries(categoriesData).map(([id, value]: [string, any]) => ({
+        id,
+        ...value,
+      }))
+    : [];
+
   return (
     <View>
       <View style={styles.FirstContainer}>
