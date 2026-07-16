@@ -11,11 +11,13 @@ import {
   persistStore,
 } from "redux-persist";
 import authReducer from "../auth/authSlice";
-import { CounterReducer } from "../components/features/CounterSlice";
 import { ShopServices } from "../services/ShopServices";
 import { userApi } from "../services/userServices";
-import { shopReducer } from "../shop/shopSlice";
 import cartReducer from "../shop/cartSlice";
+import recentlyViewedReducer from "../shop/recentlyViewedSlice";
+import { shopReducer } from "../shop/shopSlice";
+import { CounterReducer } from "./CounterSlice";
+import orderReducer from "./orderSlice";
 
 const persistConfig = {
   key: "auth",
@@ -30,6 +32,8 @@ export const store = configureStore({
     shop: shopReducer,
     auth: persistedAuthReducer,
     cart: cartReducer,
+    order: orderReducer,
+    recentlyViewed: recentlyViewedReducer,
     [ShopServices.reducerPath]: ShopServices.reducer,
     [userApi.reducerPath]: userApi.reducer,
   },

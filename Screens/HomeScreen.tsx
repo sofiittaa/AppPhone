@@ -1,17 +1,12 @@
-import ModalItem from "@/components/HomeItem";
-import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import HomeItem from "@/components/HomeItem";
+import { View } from "react-native";
 
 const HomeScreen = () => {
   return (
-    <ScrollView>
-      <View>
-        <ModalItem />
-      </View>
-    </ScrollView>
+    <View style={{ flex: 1 }}>
+      <HomeItem />
+    </View>
   );
 };
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({});

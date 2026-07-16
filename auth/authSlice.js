@@ -7,6 +7,7 @@ const initialState = {
     password: "",
     image: "",
     localId: "",
+    order: "",
   },
 };
 

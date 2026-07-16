@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
+import React from "react";
 import { persistor, store } from "../shop/store";
 
 export default function Layout() {
@@ -21,3 +22,4 @@ export default function Layout() {
     </GestureHandlerRootView>
   );
 }
+

@@ -1,98 +1,127 @@
 import { addToCart } from "@/shop/cartSlice";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import {
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useDispatch } from "react-redux";
 import { theme } from "../constants/theme";
+import { addToRecentlyViewed } from "../shop/recentlyViewedSlice";
 import { AppNavigationParamList } from "../src/navigation/types";
+import ViewedScreen from "./ViewedScreen";
 
-type ViewContainerRouteProp = RouteProp<AppNavigationParamList, "vista">;
+type RutaVistaProp = RouteProp<AppNavigationParamList, "vista">;
 
-const ViewScreen = () => {
+const PantallaVista = () => {
   const dispatch = useDispatch();
-  const route = useRoute<ViewContainerRouteProp>();
-  const product = route.params?.product;
-  const imageUrl = product?.image || "";
+  const ruta = useRoute<RutaVistaProp>();
+  const producto = ruta.params?.product;
+  const urlImage = producto?.imagen || "";
 
-  const handleAddToCart = () => {
-    if (!product) return;
+  useEffect(() => {
+    if (producto) {
+      dispatch(addToRecentlyViewed(producto));
+    }
+  }, [producto, dispatch]);
+
+  const manejarAgregarAlCarrito = () => {
+    if (!producto) return;
     dispatch(
       addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
+        id: producto.id,
+        name: producto.nombre,
+        price: producto.precio,
+        imagen: urlImage,
         quantity: 1,
       }),
     );
+    Alert.alert("Producto agregado", "Se añadió al carrito correctamente");
   };
 
-  if (!product) {
+  if (!producto) {
     return (
-      <View style={styles.card}>
-        <Text style={styles.title}>No se recibio ningun producto.</Text>
+      <View style={estilos.card}>
+        <Text style={estilos.titulo}>No se recibió ningún producto.</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View key={product.id} style={styles.card}>
-        {imageUrl ? (
-          <Image source={{ uri: imageUrl }} style={styles.image} />
-        ) : (
-          <View style={[styles.image, styles.imagePlaceholder]}>
-            <Text style={{ color: theme.colors.text }}>Sin imagen</Text>
-          </View>
-        )}
+    <ScrollView>
+      <View style={estilos.contenedor}>
+        <View key={producto.id} style={estilos.card}>
+          {urlImage ? (
+            <Image
+              source={{ uri: urlImage }}
+              style={estilos.imagen}
+              resizeMode="contain"
+            />
+          ) : (
+            <View style={[estilos.imagen, estilos.imagenPlaceholder]}>
+              <Text style={{ color: theme.colors.text }}>Sin imagen</Text>
+            </View>
+          )}
+        </View>
+        <Text style={estilos.titulo}>{producto.nombre}</Text>
+        <Text style={estilos.precio}>${producto.precio}</Text>
+        <Text style={estilos.categoria}>{producto.categoria}</Text>
+        <Pressable style={estilos.boton} onPress={manejarAgregarAlCarrito}>
+          <Text style={{ color: theme.colors.background, fontSize: 15 }}>
+            Añadir al carrito
+          </Text>
+        </Pressable>
+
+        <ViewedScreen />
       </View>
-      <Text style={styles.title}>{product.name}</Text>
-      <Text style={styles.price}>${product.price}</Text>
-      <Text style={styles.category}>{product.categories}</Text>
-      <Pressable style={styles.button} onPress={handleAddToCart}>
-        <Text style={{ color: theme.colors.background, fontSize: 15 }}>
-          Añadir al carrito
-        </Text>
-      </Pressable>
-    </View>
+    </ScrollView>
   );
 };
 
-export default ViewScreen;
+export default PantallaVista;
 
-const styles = StyleSheet.create({
-  container: {
+const estilos = StyleSheet.create({
+  contenedor: {
+    marginTop: 250,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 30,
   },
-  image: {
-    width: 200,
+  imagen: {
+    marginTop: 50,
+    width: 300,
     height: 250,
     borderRadius: 10,
-    marginLeft: 40,
+    backgroundColor: "#f5f5f5",
   },
-  title: {
+  titulo: {
     fontSize: 21,
     fontWeight: "bold",
+    textAlign: "center",
     marginTop: 10,
-    marginRight: 220,
-    color: "#060606",
+    color: theme.colors.text,
     fontFamily: theme.fonts.title,
   },
-  price: {
+  precio: {
     fontSize: 20,
-    color: "#888",
+    color: theme.colors.primary,
     marginTop: 5,
     marginRight: 300,
   },
-  category: {
+  categoria: {
     fontSize: 15,
-    color: "#888",
+    color: theme.colors.primary,
     marginTop: 5,
-    marginRight: 270,
+    marginRight: 300,
     marginBottom: 20,
   },
-  imagePlaceholder: {
+  imagenPlaceholder: {
     backgroundColor: "#ddd",
     alignItems: "center",
     justifyContent: "center",
@@ -111,7 +140,7 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 10,
   },
-  button: {
+  boton: {
     borderRadius: 25,
     width: 120,
     height: 40,

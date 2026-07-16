@@ -5,8 +5,8 @@ import CartScreen from "../../Screens/CartScreen";
 import HomeScreen from "../../Screens/HomeScreen";
 import ProductsScreen from "../../Screens/ProductsScreen";
 import ViewScreen from "../../Screens/ViewScreen";
-import { AppNavigationParamList } from "./types";
 import ProfileStack from "./profileStack";
+import { AppNavigationParamList } from "./types";
 
 const Tab = createBottomTabNavigator<AppNavigationParamList>();
 
@@ -14,6 +14,26 @@ function MyTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        tabBarStyle: {
+          backgroundColor: "#ebe7e7",
+          height: 70,
+          position: "absolute",
+          bottom: 15,
+          left: 15,
+          right: 15,
+          borderRadius: 20,
+          borderTopWidth: 2,
+          borderTopColor: "rgba(0, 0, 0, 0.08)",
+
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: -4,
+          },
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
+          elevation: 20,
+        },
         headerShown: false,
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.secondary,
@@ -46,6 +66,8 @@ function MyTabs() {
         tabBarLabelStyle: {
           fontSize: 15,
           fontFamily: theme.fonts.text,
+          fontWeight: "bold",
+          color: theme.colors.primary,
         },
       })}
     >

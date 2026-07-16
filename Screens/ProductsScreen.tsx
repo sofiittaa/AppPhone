@@ -8,36 +8,38 @@ import {
   Text,
   View,
 } from "react-native";
+import SearchVar from "../components/SearchVar";
 
 import { theme } from "../constants/theme";
-import { useGetProductsQuery } from "../services/ShopServices";
+import { Product, useGetProductsQuery } from "../services/ShopServices";
 
 const ProductsScreen = () => {
   const navigation: any = useNavigation();
 
-  const { data: products = [], isLoading, error } = useGetProductsQuery();
-  const validProducts = products.filter(
-    (product) => product && product.name && product.image,
+  const { data: productos = [], isLoading, error } = useGetProductsQuery();
+  const productosValidos = productos.filter(
+    (producto) => producto && producto.nombre && producto.imagen,
   );
 
   return (
     <ScrollView>
       <View>
+        <SearchVar />
         <View style={styles.line}>
-          {validProducts.map((product) => (
-            <View key={product.id} style={styles.productContainer}>
-              <Text style={styles.productName}>{product.name}</Text>
-              <Image
-                source={{ uri: product.image }}
-                style={styles.productImage}
-              />
+          {productosValidos.map((producto: Product) => (
+            <View key={producto.id} style={styles.productContainer}>
               <Pressable
-                style={styles.button}
-                onPress={() => navigation.navigate("vista", { product })}
+                onPress={() =>
+                  navigation.navigate("vista", { product: producto })
+                }
               >
-                <Text style={{ color: theme.colors.background, fontSize: 15 }}>
-                  Comprar
-                </Text>
+                <Image
+                  source={{ uri: producto.imagen }}
+                  style={styles.productImage}
+                  resizeMode="contain"
+                />
+                <Text style={styles.productName}>{producto.nombre}</Text>
+                <Text style={styles.productPrice}>${producto.precio}</Text>
               </Pressable>
             </View>
           ))}
@@ -54,8 +56,14 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 20,
   },
-
   button: {
     borderRadius: 25,
     width: 100,
@@ -67,7 +75,6 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.text,
     backgroundColor: theme.colors.primary,
   },
-
   title: {
     color: theme.colors.primary,
     fontSize: 30,
@@ -75,16 +82,14 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.title,
     marginTop: 10,
   },
-
   productName: {
     color: theme.colors.text,
-    fontSize: 27,
-    marginLeft: 10,
+    fontSize: 20,
     marginTop: 10,
     fontFamily: theme.fonts.text,
     marginBottom: 20,
+    textAlign: "center",
   },
-
   line: {
     marginLeft: -9,
     padding: 10,
@@ -94,10 +99,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
-
   productImage: {
-    width: 135,
-    height: 110,
+    width: "100%",
+    height: 140,
+    borderRadius: 10,
+    backgroundColor: "#f5f5f5",
   },
   productContainer: {
     borderColor: theme.colors.secondary,
@@ -106,5 +112,11 @@ const styles = StyleSheet.create({
     margin: 20,
     width: 165,
     padding: 10,
+  },
+  productPrice: {
+    color: theme.colors.primary,
+    fontSize: 15,
+    marginTop: "auto",
+    fontFamily: theme.fonts.text,
   },
 });

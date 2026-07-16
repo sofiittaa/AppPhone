@@ -3,15 +3,32 @@ import { base_url } from "../firebase/dataBase";
 
 export interface Product {
   id: string;
-  name: string;
-  categories: string;
-  image: string;
-  price: number;
+  nombre: string;
+  categoria: string;
+  imagen: string;
+  precio: number;
+  descripcion?: string;
 }
 
-export interface Category {
+export interface Categoria {
+  id: string;
+  nombre: string;
+}
+
+export interface Order {
+  id: string;
+  items: OrderItem[];
+  total: number;
+  address: { calle: string; numero: string; ciudad: string };
+  date: string;
+  status: "pending" | "approved" | "rejected";
+}
+export interface OrderItem {
   id: string;
   name: string;
+  price: number;
+  quantity: number;
+  imagen?: string;
 }
 
 export const ShopServices = createApi({
@@ -25,38 +42,64 @@ export const ShopServices = createApi({
       transformResponse: (response: any) =>
         response
           ? Object.entries(response)
-              .filter(([, product]) => product != null)
-              .map(([id, product]) => ({
+              .filter(([, producto]) => producto != null)
+              .map(([id, producto]) => ({
                 id,
-                name: (product as any).nombre || (product as any).name,
-                image: (product as any).imagen || (product as any).image,
-                categories:
-                  (product as any).categoria || (product as any).categories,
-                price: (product as any).precio || (product as any).price,
-                ...((product as any).descripcion
-                  ? { description: (product as any).descripcion }
+                nombre: (producto as any).nombre,
+                imagen: (producto as any).imagen,
+                categoria: (producto as any).categoria,
+                precio: (producto as any).precio,
+                ...((producto as any).descripcion
+                  ? { descripcion: (producto as any).descripcion }
                   : {}),
               }))
           : [],
     }),
-    getCategories: builder.query({
+    getCategorias: builder.query({
       query: () => "categories.json",
     }),
-    getProductsByCategory: builder.query<Product[], string>({
-      query: (category) =>
-        `products.json?orderBy="categoria"&equalTo="${category}"`,
+    getProductosPorCategoria: builder.query<Product[], string>({
+      query: (categoria) =>
+        `products.json?orderBy="categoria"&equalTo="${categoria}"`,
       transformResponse: (response: any) =>
         response
           ? Object.entries(response)
-              .filter(([, product]) => product != null)
-              .map(([id, product]) => ({
+              .filter(([, producto]) => producto != null)
+              .map(([id, producto]) => ({
                 id,
-                name: (product as any).nombre || (product as any).name,
-                image: (product as any).imagen || (product as any).image,
-                categories:
-                  (product as any).categoria || (product as any).categories,
-                price: (product as any).precio || (product as any).price,
+                nombre: (producto as any).nombre,
+                imagen: (producto as any).imagen,
+                categoria: (producto as any).categoria,
+                precio: (producto as any).precio,
               }))
+          : [],
+    }),
+
+    addOrder: builder.mutation({
+      query: (order) => ({
+        url: "orders.json",
+        method: "POST",
+
+        body: order,
+      }),
+    }),
+
+    addDirection: builder.mutation({
+      query: (direction) => ({
+        url: "directions.json",
+        method: "POST",
+
+        body: direction,
+      }),
+    }),
+    getOrders: builder.query<Order[], void>({
+      query: () => "orders.json",
+      transformResponse: (response: any) =>
+        response
+          ? Object.entries(response).map(([id, order]) => ({
+              id,
+              ...(order as any),
+            }))
           : [],
     }),
   }),
@@ -64,6 +107,9 @@ export const ShopServices = createApi({
 
 export const {
   useGetProductsQuery,
-  useGetCategoriesQuery,
-  useGetProductsByCategoryQuery,
+  useGetCategoriasQuery,
+  useGetProductosPorCategoriaQuery,
+  useAddOrderMutation,
+  useAddDirectionMutation,
+  useGetOrdersQuery,
 } = ShopServices;

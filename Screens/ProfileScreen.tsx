@@ -1,6 +1,8 @@
+import DirectionItem from "@/components/DirectionItem";
 import theme from "@/constants/theme";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as imagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
 import React from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,10 +11,15 @@ import CameraIcon from "../components/CameraIcon";
 import { logoutUser } from "../services/authService";
 import { usePutProfilePictureMutation } from "../services/userServices";
 import { RootState } from "../shop/store";
+import { AppNavigationParamList } from "../src/navigation/types";
 
+type ProfileNavigationProp = NativeStackNavigationProp<AppNavigationParamList>;
 const ProfileScreen = () => {
   const dispatch = useDispatch();
 
+  const navigation = useNavigation<ProfileNavigationProp>();
+
+  const order = useSelector((state: RootState) => state.auth.value.order);
   const name = useSelector((state: RootState) => state.auth.value.name);
   const user = useSelector((state: RootState) => state.auth.value.email);
   const localId = useSelector((state: RootState) => state.auth.value.localId);
@@ -113,8 +120,6 @@ const ProfileScreen = () => {
     ]);
   };
 
-  const router = useRouter();
-
   const handlelogOut = async () => {
     Alert.alert(
       "Cerrar sesión",
@@ -129,7 +134,7 @@ const ProfileScreen = () => {
               await logoutUser();
               dispatch(logout());
               dispatch(setProfilePicture(""));
-              router.replace("/ScreenLogin");
+              navigation.navigate("ScreenLogin");
             } catch (error) {
               Alert.alert(
                 "Error",
@@ -144,43 +149,62 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.profileContainer}>
-      <View style={styles.imageContainer}>
-        {image ? (
-          <Image
-            source={{ uri: image }}
-            resizeMode="cover"
-            style={styles.profileImage}
-          />
-        ) : (
-          <Text style={styles.placeholder}>
-            {user?.charAt(0).toUpperCase() || "U"}
-          </Text>
-        )}
-        <Pressable
-          onPress={selectImageOption}
-          style={({ pressed }) => [
-            { opacity: pressed ? 0.5 : 1 },
-            styles.cameraIcon,
-          ]}
-        >
-          <CameraIcon />
-        </Pressable>
+      <View style={styles.header}>
+        <View style={styles.imageContainer}>
+          {image ? (
+            <Image
+              source={{ uri: image }}
+              resizeMode="cover"
+              style={styles.profileImage}
+            />
+          ) : (
+            <Text style={styles.placeholder}>
+              {user?.charAt(0).toUpperCase() || "U"}
+            </Text>
+          )}
+          <Pressable
+            onPress={selectImageOption}
+            style={({ pressed }) => [
+              { opacity: pressed ? 0.5 : 1 },
+              styles.cameraIcon,
+            ]}
+          >
+            <CameraIcon />
+          </Pressable>
+        </View>
+        <View style={styles.contender}>
+          <View style={styles.content}>
+            <Text style={styles.name}>
+              Nombre de Usuario: {name ? name : "Sin Nombre"}
+            </Text>
+          </View>
+          <View style={styles.content}>
+            <Text style={styles.name}>Correo: {user}</Text>
+          </View>
+        </View>
       </View>
-      <View style={styles.content}>
-        <Text style={styles.name}>Nombre de Usuario: {name}</Text>
-      </View>
-      <View style={styles.content}>
-        <Text style={styles.name}>Correo: {user}</Text>
-      </View>
-      <View style={styles.content}>
-        <Text style={styles.name}>Direccion: N/A</Text>
-      </View>
-      <View style={styles.content}>
-        <Text style={styles.name}>Telefono: N/A</Text>
-      </View>
-      <View style={styles.content}>
-        <Text style={styles.name}>Metodo de pago: N/A</Text>
-      </View>
+
+      {/* <Pressable
+        style={styles.buyButton2}
+        onPress={() => navigation.navigate("Orders")}
+      >
+        <Text style={styles.logoutText}>Pedidos Realizados</Text>
+      </Pressable> */}
+
+      <Pressable
+        onPress={() => navigation.navigate("OrderDetailScreen")}
+        style={({ pressed }) => [
+          { opacity: pressed ? 0.5 : 1 },
+          styles.buyButton,
+        ]}
+      >
+        <Text style={styles.logoutText}>Detalle del pedido</Text>
+      </Pressable>
+      {}
+      <Text style={styles.name}>{order}</Text>
+
+      <DirectionItem />
+
       <Pressable onPress={handlelogOut} style={styles.logoutButton}>
         {({ pressed }) => (
           <Text style={styles.logoutText}>
@@ -196,11 +220,20 @@ export default ProfileScreen;
 
 const styles = StyleSheet.create({
   profileContainer: {
+    marginTop: 20,
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+
     padding: 20,
-    marginTop: -200,
+  },
+  header: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  contender: {
+    display: "flex",
+    flexDirection: "column",
+    marginLeft: 20,
+    marginTop: 20,
   },
   imageContainer: {
     width: 150,
@@ -240,21 +273,54 @@ const styles = StyleSheet.create({
   logoutButton: {
     padding: 10,
     borderRadius: 50,
-    width: 120,
+    width: "90%",
     height: 40,
     backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 20,
+    marginLeft: 20,
   },
   content: {
     marginTop: 20,
+    display: "flex",
+    flexDirection: "row",
     alignItems: "center",
     borderColor: theme.colors.primary,
     borderWidth: 1,
     borderRadius: 50,
     padding: 5,
-
+    width: "100%",
+  },
+  logoutButtonPressed: {
+    opacity: 0.5,
+  },
+  buyButton: {
+    borderRadius: 50,
     width: "90%",
+    height: 40,
+    backgroundColor: theme.colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    marginLeft: 20,
+  },
+  orders: {
+    flexDirection: "row",
+    marginTop: 20,
+    justifyContent: "space-between",
+    width: "90%",
+    alignItems: "center",
+    marginRight: 20,
+  },
+  buyButton2: {
+    borderRadius: 50,
+    width: "90%",
+    height: 40,
+    backgroundColor: theme.colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    marginLeft: 20,
   },
 });

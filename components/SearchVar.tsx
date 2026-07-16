@@ -14,7 +14,7 @@ const SearchVar = () => {
         onChangeText={setSearch}
         lightTheme
         containerStyle={{
-          marginTop: 30,
+          marginTop: 50,
           padding: 0,
         }}
         inputContainerStyle={{

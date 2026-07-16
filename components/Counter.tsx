@@ -43,9 +43,9 @@ export default Counter;
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 50,
-    height: 50,
-    marginTop: 1,
+    borderRadius: 100,
+    height: 40,
+    marginTop: 15,
     width: 40,
     alignItems: "center",
     backgroundColor: theme.colors.primary,
@@ -53,19 +53,19 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color:"white",
-    fontSize: 24,
+    color: "white",
+    fontSize: 20,
   },
 
   content: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginRight: 50,
-    marginTop: -20,
+    alignItems: "center",
+    marginBottom: 10,
   },
 
   number: {
-    marginTop: 10,
+    marginTop: 20,
     marginLeft: 10,
     marginRight: 10,
     fontSize: 20,

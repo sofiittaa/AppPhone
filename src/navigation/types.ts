@@ -6,5 +6,6 @@ export type AppNavigationParamList = {
   Carrito: undefined;
   Perfil: undefined;
   vista: { product: Product };
-  
+  OrderDetailScreen: undefined;
+  ScreenLogin: undefined;
 };
