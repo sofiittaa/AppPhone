@@ -1,17 +1,20 @@
 import { theme } from "@/constants/theme";
 import { SearchBar } from "@rneui/themed";
-import { useState } from "react";
 import { View } from "react-native";
 
-const SearchVar = () => {
-  const [search, setSearch] = useState("");
-
+const SearchVar = ({
+  value,
+  onChangeText,
+}: {
+  value: string;
+  onChangeText: (text: string) => void;
+}) => {
   return (
     <View>
       <SearchBar
         placeholder="Buscar"
-        value={search}
-        onChangeText={setSearch}
+        value={value}
+        onChangeText={onChangeText}
         lightTheme
         containerStyle={{
           marginTop: 50,

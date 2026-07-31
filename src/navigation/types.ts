@@ -8,4 +8,5 @@ export type AppNavigationParamList = {
   vista: { product: Product };
   OrderDetailScreen: undefined;
   ScreenLogin: undefined;
+  
 };

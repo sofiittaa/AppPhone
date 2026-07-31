@@ -3,10 +3,15 @@ import { Image } from "@rneui/themed";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import { useSelector } from "react-redux";
 import { useGetOrdersQuery } from "../services/ShopServices";
+import { RootState } from "../shop/store";
 
 const OrderDetailScreen = () => {
-  const { data: orders = [], isLoading, error } = useGetOrdersQuery();
+  const userId = useSelector((state: RootState) => state.auth.value.localId);
+  const { data: orders = [], isLoading, error } = useGetOrdersQuery(userId, {
+    skip: !userId,
+  });
 
   if (isLoading) {
     return (
@@ -17,9 +22,19 @@ const OrderDetailScreen = () => {
   }
 
   if (error) {
+    const reason =
+      typeof (error as any)?.data === "string"
+        ? (error as any).data
+        : (error as any)?.data?.error ||
+          (error as any)?.data?.message ||
+          (error as any)?.error ||
+          (error as any)?.message ||
+          "Verificá la sesión y las reglas de Firebase.";
+
     return (
       <View style={styles.main}>
         <Text style={styles.title}>Error al cargar pedidos</Text>
+        <Text style={styles.errorText}>{reason}</Text>
       </View>
     );
   }
@@ -91,6 +106,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 20,
     textAlign: "center",
+  },
+  errorText: {
+    color: theme.colors.text,
+    fontSize: 16,
+    textAlign: "center",
+    paddingHorizontal: 24,
   },
   detailText: {
     fontSize: 20,

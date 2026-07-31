@@ -33,6 +33,7 @@ export const store = configureStore({
     auth: persistedAuthReducer,
     cart: cartReducer,
     order: orderReducer,
+    address: orderReducer,
     recentlyViewed: recentlyViewedReducer,
     [ShopServices.reducerPath]: ShopServices.reducer,
     [userApi.reducerPath]: userApi.reducer,

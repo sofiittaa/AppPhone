@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -9,7 +10,9 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../auth/authSlice";
 import theme from "../constants/theme";
+import { auth } from "../firebase/fireBaseConfig";
 import { useAddOrderMutation } from "../services/ShopServices";
 import { clearCart } from "../shop/cartSlice";
 import { RootState } from "../shop/store";
@@ -22,7 +25,9 @@ const CheckOut = ({
   setVisible: (value: boolean) => void;
 }) => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const items = useSelector((state: RootState) => state.cart.items);
+  const userId = useSelector((state: RootState) => state.auth.value.localId);
 
   const [addOrder] = useAddOrderMutation();
 
@@ -35,6 +40,30 @@ const CheckOut = ({
   const [tarjeta, setTarjeta] = useState("");
   const [fecha, setFecha] = useState("");
   const [cvv, setCvv] = useState("");
+
+  const resetCheckout = () => {
+    setStep("address");
+    setCalle("");
+    setNumero("");
+    setCiudad("");
+    setNombre("");
+    setTarjeta("");
+    setFecha("");
+    setCvv("");
+  };
+
+  const handleCancel = () => {
+    resetCheckout();
+    setVisible(false);
+  };
+
+  const handleBackToAddress = () => {
+    setNombre("");
+    setTarjeta("");
+    setFecha("");
+    setCvv("");
+    setStep("address");
+  };
 
   const handleNext = () => {
     if (!calle.trim() || !numero.trim() || !ciudad.trim()) {
@@ -62,6 +91,18 @@ const CheckOut = ({
     setStep("payment");
   };
   const handleConfirm = async () => {
+    await auth.authStateReady();
+    if (!userId || !auth.currentUser || auth.currentUser.uid !== userId) {
+      dispatch(logout());
+      Alert.alert(
+        "Sesi\u00f3n expirada",
+        "Volv\u00e9 a iniciar sesi\u00f3n para confirmar tu compra.",
+      );
+      handleCancel();
+      router.replace("/ScreenLogin");
+      return;
+    }
+
     if (!nombre.trim() || !tarjeta.trim() || !fecha.trim() || !cvv.trim()) {
       Alert.alert("Error 😅", "Completá todos los datos de pago");
       return;
@@ -95,22 +136,27 @@ const CheckOut = ({
     try {
       await addOrder({
         id: Date.now().toString(),
+        userId,
         items,
         total,
         address: { calle, numero, ciudad },
         date: new Date().toLocaleDateString(),
         status: "pending",
-      });
+      }).unwrap();
 
       dispatch(clearCart());
       Alert.alert("Compra exitosa 🎉", "Gracias por tu compra");
-      setVisible(false);
-      setStep("address");
-      setCalle("");
-      setNumero("");
-      setCiudad("");
-    } catch (error) {
-      Alert.alert("Error", "No se pudo procesar la compra. Intentá de nuevo.");
+      handleCancel();
+    } catch (error: any) {
+      resetCheckout();
+      const reason =
+        typeof error?.data === "string"
+          ? error.data
+          : error?.data?.error ||
+            error?.error ||
+            error?.message ||
+            "Firebase rechazó la compra.";
+      Alert.alert("No se pudo completar la compra", reason);
     }
   };
 
@@ -184,15 +230,20 @@ const CheckOut = ({
                 onChangeText={setCvv}
               />
 
-              <Pressable style={styles.button} onPress={handleConfirm}>
-                <Text style={styles.buttonText}>Confirmar pago</Text>
-              </Pressable>
+              <View style={styles.paymentActions}>
+                <Pressable style={styles.backButton} onPress={handleBackToAddress}>
+                  <Text style={styles.backButtonText}>Volver</Text>
+                </Pressable>
+                <Pressable style={styles.button} onPress={handleConfirm}>
+                  <Text style={styles.buttonText}>Confirmar pago</Text>
+                </Pressable>
+              </View>
             </>
           )}
 
           <Pressable
             style={styles.cancelButton}
-            onPress={() => setVisible(false)}
+            onPress={handleCancel}
           >
             <Text style={styles.cancel}>Cancelar</Text>
           </Pressable>
@@ -205,7 +256,6 @@ export default CheckOut;
 
 const styles = StyleSheet.create({
   button: {
-    marginTop: 20,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: theme.colors.primary,
@@ -213,6 +263,25 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 130,
     height: 50,
+  },
+  paymentActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  backButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: theme.colors.text,
+    borderWidth: 1,
+    borderRadius: 10,
+    width: 110,
+    height: 50,
+  },
+  backButtonText: {
+    color: theme.colors.text,
+    fontSize: 15,
   },
   buttonText: {
     color: "#fff",
@@ -266,13 +335,12 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
   },
   cancelButton: {
-    marginTop: -49,
+    marginTop: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 150,
     borderColor: theme.colors.text,
     borderWidth: 1,
-    width: 138,
+    width: "100%",
     height: 49,
     borderRadius: 10,
     color: "gray",

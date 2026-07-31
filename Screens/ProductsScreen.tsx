@@ -1,46 +1,98 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import React, { useState } from "react";
+import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import CategoryItem from "../components/CategoyItem";
+import ProductView from "../components/ProductView";
 import SearchVar from "../components/SearchVar";
 
 import { theme } from "../constants/theme";
-import { Product, useGetProductsQuery } from "../services/ShopServices";
+import {
+  Product,
+  useGetCategoriasQuery,
+  useGetProductsQuery,
+} from "../services/ShopServices";
+import { AppNavigationParamList } from "../src/navigation/types";
+
+// Algunos productos en Firebase quedaron con la categoría mal escrita
+// respecto al nombre real de la categoría; se normalizan acá para que el filtro matchee.
+const CATEGORIA_ALIASES: Record<string, string> = {
+  carnes: "carne",
+  alcohol: "con alcohol",
+};
+
+const normalizeCategoria = (value: string) => {
+  const normalized = value?.trim().toLowerCase() ?? "";
+  return CATEGORIA_ALIASES[normalized] || normalized;
+};
 
 const ProductsScreen = () => {
-  const navigation: any = useNavigation();
-
+  const navigation = useNavigation<NavigationProp<AppNavigationParamList>>();
   const { data: productos = [], isLoading, error } = useGetProductsQuery();
-  const productosValidos = productos.filter(
-    (producto) => producto && producto.nombre && producto.imagen,
+  const { data: categoriasData } = useGetCategoriasQuery(undefined);
+  const categorias = categoriasData
+    ? Object.entries(categoriasData)
+        .map(([id, value]: [string, any]) => ({ id, ...value }))
+        .filter((categoria) => categoria.name)
+    : [];
+
+  const [search, setSearch] = useState("");
+  const [selectedCategoria, setSelectedCategoria] = useState<string | null>(
+    null,
   );
+
+  const productosValidos = productos
+    .filter((producto) => producto && producto.nombre && producto.imagen)
+    .filter(
+      (producto) =>
+        !selectedCategoria ||
+        normalizeCategoria(producto.categoria) ===
+          normalizeCategoria(selectedCategoria),
+    )
+    .filter((producto) =>
+      producto.nombre.toLowerCase().includes(search.trim().toLowerCase()),
+    );
 
   return (
     <ScrollView>
       <View>
-        <SearchVar />
+        <SearchVar value={search} onChangeText={setSearch} />
+
+        <FlatList
+          data={categorias}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.categoriesRow}
+          renderItem={({ item }) => (
+            <CategoryItem
+              item={item}
+              selected={selectedCategoria === item.name}
+              onPress={() =>
+                setSelectedCategoria((current) =>
+                  current === item.name ? null : item.name,
+                )
+              }
+            />
+          )}
+        />
+
         <View style={styles.line}>
           {productosValidos.map((producto: Product) => (
             <View key={producto.id} style={styles.productContainer}>
               <Pressable
-                onPress={() =>
-                  navigation.navigate("vista", { product: producto })
-                }
+                onPress={() => navigation.navigate("vista", { product: producto })}
               >
                 <Image
                   source={{ uri: producto.imagen }}
                   style={styles.productImage}
                   resizeMode="contain"
                 />
-                <Text style={styles.productName}>{producto.nombre}</Text>
-                <Text style={styles.productPrice}>${producto.precio}</Text>
               </Pressable>
+              <Text style={styles.productName}>{producto.nombre}</Text>
+              <View style={styles.priceRow}>
+                <Text style={styles.productPrice}>${producto.precio}</Text>
+                <ProductView product={producto} />
+              </View>
             </View>
           ))}
         </View>
@@ -52,6 +104,17 @@ const ProductsScreen = () => {
 export default ProductsScreen;
 
 const styles = StyleSheet.create({
+  categoriesRow: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+
   categorias: {
     display: "flex",
     flexDirection: "row",
@@ -115,8 +178,8 @@ const styles = StyleSheet.create({
   },
   productPrice: {
     color: theme.colors.primary,
-    fontSize: 15,
-    marginTop: "auto",
+    fontSize: 18,
     fontFamily: theme.fonts.text,
+    fontWeight: "bold",
   },
 });

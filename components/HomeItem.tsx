@@ -4,11 +4,13 @@ import {
   FlatList,
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { useSelector } from "react-redux";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../constants/theme";
 import {
   useGetCategoriasQuery,
@@ -17,6 +19,10 @@ import {
 import { RootState } from "../shop/store";
 import { AppNavigationParamList } from "../src/navigation/types";
 import CategoryItem from "./CategoyItem";
+import OffersSection from "./OffersSection";
+import PromoBanner from "./PromoBanner";
+import StoreHours from "./StoreHours";
+import StoreLocations from "./StoreLocations";
 
 const HomeItem = () => {
   const viewedProducts = useSelector(
@@ -39,50 +45,66 @@ const HomeItem = () => {
   const featuredProducts = productos ? productos.slice(0, 5) : [];
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <View style={styles.FirstContainer}>
-        <View style={styles.container}>
-          <Image
-            source={require("../assets/images/logo.png")}
-            style={styles.logo}
-          />
+    <SafeAreaView
+      edges={["top"]}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+    >
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.FirstContainer}>
+          <View style={styles.container}>
+            <Image
+              source={require("../assets/images/logo.png")}
+              style={styles.logo}
+            />
+          </View>
         </View>
-      </View>
 
-      <View style={styles.categoriesContainer}>
+        <PromoBanner />
+
+        <Text style={styles.sectionTitle}>Categorías</Text>
         <FlatList
           data={categories}
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.categoriesList}
           renderItem={({ item }) => <CategoryItem item={item} />}
         />
-      </View>
-      <Text style={styles.sectionTitle}>Productos Destacados</Text>
 
-      <View style={styles.featuredContainer}>
+        <Text style={styles.sectionTitle}>Productos Destacados</Text>
+
         <FlatList
           data={featuredProducts}
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.featuredList}
           renderItem={({ item }) => (
             <Pressable
+              style={({ pressed }) => [
+                styles.productItem,
+                pressed && styles.productItemPressed,
+              ]}
               onPress={() => navigation.navigate("vista", { product: item })}
             >
-              <View style={styles.productItem}>
-                <Image
-                  source={{ uri: item.imagen }}
-                  style={styles.productImage}
-                />
-                <Text style={styles.productName}>{item.nombre}</Text>
-                <Text style={styles.productPrice}>${item.precio}</Text>
-              </View>
+              <Image
+                source={{ uri: item.imagen }}
+                style={styles.productImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.productName} numberOfLines={2}>
+                {item.nombre}
+              </Text>
+              <Text style={styles.productPrice}>${item.precio}</Text>
             </Pressable>
           )}
         />
-      </View>
-    </View>
+
+        <OffersSection />
+        <StoreHours />
+        <StoreLocations />
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -113,45 +135,52 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 35,
   },
-  categoriesContainer: {
-    marginTop: 20,
-    marginHorizontal: 10,
-  },
-  featuredContainer: {
-    borderColor: theme.colors.primary,
-    borderWidth: 1,
-    borderRadius: 50,
-    marginTop: 20,
-    marginHorizontal: 10,
+  categoriesList: {
+    paddingHorizontal: 15,
+    paddingBottom: 4,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: theme.colors.primary,
-    marginBottom: -10,
-    marginLeft: 115,
+    marginTop: 20,
+    marginBottom: 10,
+    marginHorizontal: 15,
+  },
+  featuredList: {
+    paddingHorizontal: 15,
+    paddingBottom: 4,
   },
   productItem: {
-    width: 120,
-    marginRight: 10,
+    width: 130,
+    marginRight: 12,
     alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    borderRadius: 16,
+    padding: 12,
+  },
+  productItemPressed: {
+    opacity: 0.7,
   },
   productImage: {
-    width: 100,
-    height: 100,
-    marginTop: 5,
-    borderRadius: 40,
+    width: 90,
+    height: 90,
+    borderRadius: 12,
+    backgroundColor: "#fff",
   },
   productName: {
     fontSize: 14,
+    fontFamily: theme.fonts.text,
     textAlign: "center",
-    marginTop: 5,
+    marginTop: 8,
+    minHeight: 34,
     color: theme.colors.text,
   },
   productPrice: {
     fontSize: 16,
     fontWeight: "bold",
     color: theme.colors.primary,
+    marginTop: 4,
   },
   recentContainer: {
     marginTop: 20,
